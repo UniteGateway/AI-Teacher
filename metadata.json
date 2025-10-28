@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Nuro AI Labs - Teacher AI v3",
+  "description": "An interactive AI Teacher application powered by Google Gemini. Select an avatar, chat with your AI tutor, and watch their explanations appear live on a virtual blackboard.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
