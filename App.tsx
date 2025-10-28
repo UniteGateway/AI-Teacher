@@ -47,7 +47,7 @@ const App: React.FC = () => {
   const [generatedHtml, setGeneratedHtml] = useState<string | null>(null);
   const [currentWebsitePrompt, setCurrentWebsitePrompt] = useState<string>('');
 
-  const aiRef = useRef<GoogleGenAI | null>(null);
+  const [ai, setAi] = useState<GoogleGenAI | null>(null);
 
   // --- Data Fetching Effect ---
   useEffect(() => {
@@ -65,7 +65,7 @@ const App: React.FC = () => {
         console.error("API_KEY environment variable not set.");
         return;
       }
-      aiRef.current = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      setAi(new GoogleGenAI({ apiKey: process.env.API_KEY }));
     } catch (error) {
         console.error("Failed to initialize GoogleGenAI:", error);
     }
@@ -173,7 +173,7 @@ const App: React.FC = () => {
 
 
   const handleGenerateWebsite = useCallback(async (prompt: string): Promise<{success: boolean, error?: string}> => {
-    if (!aiRef.current) return { success: false, error: 'AI not initialized.' };
+    if (!ai) return { success: false, error: 'AI not initialized.' };
     
     setCurrentWebsitePrompt(prompt);
     setGeneratedHtml(null);
@@ -191,7 +191,7 @@ const App: React.FC = () => {
             User Prompt: "${prompt}"
         `;
         
-        const response = await aiRef.current.models.generateContent({
+        const response = await ai.models.generateContent({
             model: 'gemini-2.5-pro',
             contents: fullPrompt,
         });
@@ -212,13 +212,13 @@ const App: React.FC = () => {
         const errorMsg = "Sorry, something went wrong. The AI may be experiencing high demand. Please try a different prompt or try again later.";
         return { success: false, error: errorMsg };
     }
-  }, []);
+  }, [ai]);
 
   // --- MOCKED STUDIO API HANDLERS ---
   const handleGenerateImage = useCallback(async (prompt: string): Promise<string[]> => {
-      if (!aiRef.current) throw new Error('AI not initialized.');
+      if (!ai) throw new Error('AI not initialized.');
       
-      const response = await aiRef.current.models.generateContent({
+      const response = await ai.models.generateContent({
           model: 'gemini-2.5-flash-image',
           contents: { parts: [{ text: prompt }] },
           config: { responseModalities: [Modality.IMAGE] },
@@ -231,10 +231,10 @@ const App: React.FC = () => {
           }
       }
       return images;
-  }, []);
+  }, [ai]);
 
   const handleGenerateVideo = useCallback(async (prompt: string, onProgress: (message: string) => void): Promise<string> => {
-      if (!aiRef.current) throw new Error('AI not initialized.');
+      if (!ai) throw new Error('AI not initialized.');
       if (!process.env.API_KEY) throw new Error("API key is not configured.");
 
       const progressMessages = [ "Scripting your educational short...", "Gathering visual concepts...", "Rendering the first few frames...", "Applying visual effects...", "Finalizing the render..."];
@@ -245,7 +245,7 @@ const App: React.FC = () => {
       }, 5000);
 
       try {
-          let operation = await aiRef.current.models.generateVideos({
+          let operation = await ai.models.generateVideos({
               model: 'veo-3.1-fast-generate-preview',
               prompt: `A short, 10-second educational video about: ${prompt}`,
               config: { numberOfVideos: 1, resolution: '720p', aspectRatio: '16:9' }
@@ -253,7 +253,7 @@ const App: React.FC = () => {
 
           while (!operation.done) {
               await new Promise(resolve => setTimeout(resolve, 10000));
-              operation = await aiRef.current.operations.getVideosOperation({ operation: operation });
+              operation = await ai.operations.getVideosOperation({ operation: operation });
           }
 
           const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
@@ -268,19 +268,19 @@ const App: React.FC = () => {
       } finally {
           clearInterval(interval);
       }
-  }, [aiRef.current]);
+  }, [ai]);
 
   const handleGenerateReport = useCallback(async (topic: string): Promise<string> => {
-      if (!aiRef.current) throw new Error('AI not initialized.');
+      if (!ai) throw new Error('AI not initialized.');
       
       const fullPrompt = `Generate a concise, well-structured project report for a student on the topic: "${topic}". The report should be about 300 words, written in clear, accessible language. Structure it with a title, a brief introduction, 2-3 main body paragraphs with headings, and a short conclusion. Use Markdown for formatting (e.g., # for title, ## for headings, * for italics).`;
       
-      const response = await aiRef.current.models.generateContent({
+      const response = await ai.models.generateContent({
           model: 'gemini-2.5-pro',
           contents: fullPrompt,
       });
       return response.text;
-  }, [aiRef.current]);
+  }, [ai]);
 
 
   const renderCurrentPage = () => {
@@ -321,7 +321,7 @@ const App: React.FC = () => {
             if (!currentUser) {
                 return <AiTeacherLandingPage onNavigate={handleNavigation} />;
             }
-            if (!aiRef.current) return <div className="flex-1 flex items-center justify-center"><p>Initializing AI...</p></div>;
+            if (!ai) return <div className="flex-1 flex items-center justify-center"><p>Initializing AI...</p></div>;
             return renderDashboard();
     }
 
@@ -349,14 +349,14 @@ const App: React.FC = () => {
     if (!currentUser) return null;
 
     if (currentUser.role === UserRole.STUDENT) {
-        if (!aiRef.current) return <div className="flex-1 flex items-center justify-center"><p>Initializing AI...</p></div>;
+        if (!ai) return <div className="flex-1 flex items-center justify-center"><p>Initializing AI...</p></div>;
         
         let dashboardContent;
         if (viewingSession) {
             dashboardContent = (
                 <StudentDashboard
                     key={viewingSession.id}
-                    ai={aiRef.current}
+                    ai={ai}
                     currentUser={currentUser}
                     initialSessionData={viewingSession}
                     isReadOnly={true}
@@ -368,7 +368,7 @@ const App: React.FC = () => {
              dashboardContent = (
                 <StudentDashboard
                     key={activeChat.teacher.id}
-                    ai={aiRef.current}
+                    ai={ai}
                     currentUser={currentUser}
                     selectedTeacher={activeChat.teacher}
                     isReadOnly={false}
