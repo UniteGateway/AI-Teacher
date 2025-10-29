@@ -6,9 +6,9 @@ interface HomePageProps {
 }
 
 const heroImages = [
-    "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=2020&auto=format=fit=crop",
-    "https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=2070&auto=format=fit=crop",
-    "https://images.unsplash.com/photo-1605379399642-870262d3d051?q=80&w=2106&auto=format=fit=crop",
+    "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=2020&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1605379399642-870262d3d051?q=80&w=2106&auto=format&fit=crop",
 ];
 
 const learningCategories: LearningCategory[] = [
@@ -16,7 +16,7 @@ const learningCategories: LearningCategory[] = [
   { title: 'Python with AI', description: 'Combine Python programming with modern AI models.', imageUrl: 'https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=800' },
   { title: 'Machine Learning (ML)', description: 'Build models that learn from data.', imageUrl: 'https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=800' },
   { title: 'Deep Learning', description: 'Dive into neural networks and transformers.', imageUrl: 'https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=800' },
-  { title: 'AI Agents', description: 'Explore intelligent agents that think and act autonomously.', imageUrl: 'https://images.unsplash.com/photo-1698224132044-f54245c5890b?q=80&w=800&auto=format=fit=crop' },
+  { title: 'AI Agents', description: 'Explore intelligent agents that think and act autonomously.', imageUrl: 'https://images.unsplash.com/photo-1698224132044-f54245c5890b?q=80&w=800&auto=format&fit=crop' },
   { title: 'AutoML', description: 'Automate your model building and deployment process.', imageUrl: 'https://images.pexels.com/photos/18069699/pexels-photo-18069699.jpeg?auto=compress&cs=tinysrgb&w=800' },
   { title: 'N8N Automation', description: 'Automate tasks and workflows using low-code AI tools.', imageUrl: 'https://images.pexels.com/photos/5926382/pexels-photo-5926382.jpeg?auto=compress&cs=tinysrgb&w=800' },
   { title: 'AI Business Analytics', description: 'Learn how AI drives insights and decisions in business.', imageUrl: 'https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=800' },
@@ -84,6 +84,67 @@ const AiLearningCard: React.FC<{
         </div>
     </div>
 );
+
+const EmpowermentCard: React.FC<{
+    icon: string;
+    title: string;
+    description: string;
+    imageUrl: string;
+    buttonText: string;
+    onNavigate: () => void;
+    style?: React.CSSProperties;
+}> = ({ icon, title, description, imageUrl, buttonText, onNavigate, style }) => (
+    <div className="group bg-gray-800/50 border border-gray-700 rounded-2xl overflow-hidden flex flex-col shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 transform hover:-translate-y-1 animate-fade-in-up" style={style}>
+        <div className="aspect-video overflow-hidden">
+            <img loading="lazy" src={imageUrl} alt={title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+        </div>
+        <div className="p-6 flex flex-col flex-grow">
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">{icon} {title}</h3>
+            <p className="text-gray-400 mt-2 text-sm flex-grow">{description}</p>
+            <button
+                onClick={onNavigate}
+                className="mt-6 bg-gray-700 group-hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors self-start text-sm"
+            >
+                {buttonText}
+            </button>
+        </div>
+    </div>
+);
+
+const empowermentCategories = [
+    {
+        icon: '🏫',
+        title: 'AI Learning for Schools',
+        description: 'Interactive lessons for grade 5 and above. Introduce students to AI tools, logic thinking, and creative coding.',
+        imageUrl: 'https://images.pexels.com/photos/4144222/pexels-photo-4144222.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+        buttonText: 'Explore School Programs',
+        page: Page.LEARNING_SCHOOLS,
+    },
+    {
+        icon: '🎓',
+        title: 'AI Learning for Colleges & Universities',
+        description: 'Enable AI-driven learning environments, live research projects, and practical data science labs.',
+        imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop',
+        buttonText: 'Discover Courses',
+        page: Page.LEARNING_COLLEGE,
+    },
+    {
+        icon: '🏢',
+        title: 'Corporate AI Learning for Employees',
+        description: 'Empower your teams with AI-driven skill development — from data analytics to automation tools.',
+        imageUrl: 'https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+        buttonText: 'Join Corporate Training',
+        page: Page.CONTACT_SALES,
+    },
+    {
+        icon: '🧾',
+        title: 'AI Learning for Govt Exams',
+        description: 'Smart AI-based test prep for UPSC, SSC, banking, and other competitive exams — powered by adaptive analytics.',
+        imageUrl: 'https://images.pexels.com/photos/3184304/pexels-photo-3184304.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+        buttonText: 'Start Learning',
+        page: Page.LEARNING_EXAMS,
+    }
+];
 
 
 const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
@@ -198,6 +259,41 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             gradient="from-orange-400 to-red-400"
         />
       </section>
+      
+      {/* Empowering Every Learner Section */}
+      <section id="empowering-learners" className="py-20 px-4 w-full max-w-7xl mx-auto">
+        <div className="text-center">
+            <h2 className="text-4xl font-bold mb-4">Empowering Every Learner Through AI</h2>
+            <p className="text-lg text-gray-400 max-w-3xl mx-auto">
+                From schools to enterprises — discover how AI transforms learning, training, and innovation for everyone.
+            </p>
+        </div>
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {empowermentCategories.map((cat, index) => (
+                <EmpowermentCard
+                    key={cat.title}
+                    icon={cat.icon}
+                    title={cat.title}
+                    description={cat.description}
+                    imageUrl={cat.imageUrl}
+                    buttonText={cat.buttonText}
+                    onNavigate={() => onNavigate(cat.page)}
+                    style={{ animationDelay: `${index * 100}ms` }}
+                />
+            ))}
+        </div>
+        <div className="mt-12 text-center">
+            <button
+                onClick={() => {
+                    const element = document.getElementById('ai-programs');
+                    element?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="bg-gray-800/50 hover:bg-gray-700/80 border border-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            >
+                👉 View All AI Learning Programs
+            </button>
+        </div>
+    </section>
 
       {/* Explore AI Learning Programs Section */}
       <section id="ai-programs" className="py-20 px-4 w-full max-w-7xl mx-auto">

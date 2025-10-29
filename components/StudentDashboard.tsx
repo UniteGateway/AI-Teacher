@@ -209,7 +209,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
             },
         });
         if (chatHistory.length === 0) {
-            setBlackboardContent(`Hello! I'm ${selectedTeacher.name}. What shall we learn about today? You can chat with me here or start a virtual call.`);
+            setBlackboardContent(`Hello! I'm ${selectedTeacher.name}. You can chat with me here or start a virtual call.`);
         }
     }
   }, [selectedTeacher, ai, isReadOnly, chatHistory.length]);
@@ -281,8 +281,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     sessionPromiseRef.current?.then(session => session.close());
     sessionPromiseRef.current = null;
     
-    inputAudioContextRef.current?.close();
-    outputAudioContextRef.current?.close();
+    inputAudioContextRef.current?.close().catch(() => {});
+    outputAudioContextRef.current?.close().catch(() => {});
     
     setVideoUrl(null);
     setYoutubeEmbedUrl(null);
@@ -429,14 +429,18 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
   
   const handleToggleMute = useCallback(() => setIsMicrophoneMuted(prev => !prev), []);
   
+  // Manages the lifecycle of the Web Speech API for voice commands to prevent microphone conflicts.
   useEffect(() => {
     const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognitionAPI || isReadOnly) {
+    
+    // Voice commands are disabled if the API is unsupported, the view is read-only, or a call is active.
+    if (!SpeechRecognitionAPI || isReadOnly || isCallActive) {
+      // The cleanup function from the previous render will handle stopping any active recognition.
       return;
     }
 
     const recognition: SpeechRecognition = new SpeechRecognitionAPI();
-    recognition.continuous = true;
+    recognition.continuous = false; // Stop after one utterance.
     recognition.interimResults = false;
     recognition.lang = 'en-US';
     speechRecognitionRef.current = recognition;
@@ -444,39 +448,48 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     recognition.onresult = (event: any) => {
         const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
         
-        if (callStatus === CallStatus.IDLE && /(start|begin) call/.test(transcript)) {
+        // This effect only runs when a call is idle, so we only need to listen for the "start call" command.
+        if (/(start|begin) call/.test(transcript)) {
             startCall();
-        } else if (isCallActive) {
-            if (/(end|hang up) call/.test(transcript)) {
-                endCall();
-            } else if (/mute (microphone|mic)/.test(transcript)) {
-                if (!isMicrophoneMuted) handleToggleMute();
-            } else if (/unmute (microphone|mic)/.test(transcript)) {
-                if (isMicrophoneMuted) handleToggleMute();
-            }
         }
     };
 
     recognition.onerror = (event: any) => {
-        if (event.error === 'no-speech' || event.error === 'aborted') return;
-        console.error('Speech recognition error', event.error);
+        // The 'audio-capture' error is common if the mic is busy. By disabling this during calls,
+        // we prevent that conflict. We still log other errors.
+        if (event.error !== 'no-speech' && event.error !== 'aborted') {
+            console.error('Speech recognition error:', event.error);
+        }
     };
     
     recognition.onend = () => {
-        if (speechRecognitionRef.current) {
-            try { speechRecognitionRef.current.start(); } catch (e) { /* Already started */ }
+        // Automatically restart recognition after it stops, but only if this instance is still active.
+        if (speechRecognitionRef.current === recognition) {
+            try { 
+                recognition.start();
+            } catch (e) { 
+                // This might fail if the state changed and the component is stopping recognition.
+            }
         }
     };
 
-    try { recognition.start(); } catch(e) { console.error("Speech recognition could not start.", e); }
+    try { 
+        recognition.start(); 
+    } catch(e) { 
+        console.error("Speech recognition could not start.", e); 
+    }
 
     return () => {
-        if(speechRecognitionRef.current) {
+        if (speechRecognitionRef.current) {
+            // Detach handlers and stop to prevent memory leaks or unwanted restarts.
+            speechRecognitionRef.current.onend = null;
+            speechRecognitionRef.current.onresult = null;
+            speechRecognitionRef.current.onerror = null;
             speechRecognitionRef.current.stop();
             speechRecognitionRef.current = null;
         }
     };
-  }, [callStatus, isCallActive, isMicrophoneMuted, startCall, endCall, handleToggleMute, isReadOnly]);
+  }, [isCallActive, isReadOnly, startCall]);
 
   // --- UI Handlers ---
   const handleAddGoal = (text: string) => setLearningGoals(prev => [{ id: `goal-${Date.now()}`, text, status: GoalStatus.TODO }, ...prev]);
