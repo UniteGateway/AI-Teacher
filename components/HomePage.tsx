@@ -6,7 +6,7 @@ interface HomePageProps {
 }
 
 const heroImages = [
-    "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=2020&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=2020&auto=format=fit=crop",
     "https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=2070&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1605379399642-870262d3d051?q=80&w=2106&auto=format&fit=crop",
 ];
@@ -16,7 +16,7 @@ const learningCategories: LearningCategory[] = [
   { title: 'Python with AI', description: 'Combine Python programming with modern AI models.', imageUrl: 'https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=800' },
   { title: 'Machine Learning (ML)', description: 'Build models that learn from data.', imageUrl: 'https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=800' },
   { title: 'Deep Learning', description: 'Dive into neural networks and transformers.', imageUrl: 'https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=800' },
-  { title: 'AI Agents', description: 'Explore intelligent agents that think and act autonomously.', imageUrl: 'https://images.unsplash.com/photo-1698224132044-f54245c5890b?q=80&w=800&auto=format&fit=crop' },
+  { title: 'AI Agents', description: 'Explore intelligent agents that think and act autonomously.', imageUrl: 'https://images.unsplash.com/photo-1698224132044-f54245c5890b?q=80&w=800&auto=format=fit=crop' },
   { title: 'AutoML', description: 'Automate your model building and deployment process.', imageUrl: 'https://images.pexels.com/photos/18069699/pexels-photo-18069699.jpeg?auto=compress&cs=tinysrgb&w=800' },
   { title: 'N8N Automation', description: 'Automate tasks and workflows using low-code AI tools.', imageUrl: 'https://images.pexels.com/photos/5926382/pexels-photo-5926382.jpeg?auto=compress&cs=tinysrgb&w=800' },
   { title: 'AI Business Analytics', description: 'Learn how AI drives insights and decisions in business.', imageUrl: 'https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=800' },
@@ -124,7 +124,7 @@ const empowermentCategories = [
         icon: '🎓',
         title: 'AI Learning for Colleges & Universities',
         description: 'Enable AI-driven learning environments, live research projects, and practical data science labs.',
-        imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop',
+        imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format=fit=crop',
         buttonText: 'Discover Courses',
         page: Page.LEARNING_COLLEGE,
     },
